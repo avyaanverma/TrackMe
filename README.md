@@ -1,12 +1,8 @@
-# React + Vite
+# Track Me -- To do List + Habit Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+// last updated on : 17/05/2025
+// Author : @avyaanver
 
-Currently, two official plugins are available:
+Okay so today I am creating a to do list and I have created it before but this time i want to take this to do list next level by making a to do list in a way that it actually tracks my habits workign as a habit tracker also having charts and everything right now i am not planning anything before i will plan everything step by step so that I waste less time doing it and working on the project. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+To complete this project i will be using the agile framework
