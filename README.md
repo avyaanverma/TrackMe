@@ -259,6 +259,56 @@ May 21, 2025
 
     ![toDoWorking](images/todoWorking.jpg)
 
-## Phase three - connecting it with calendar
+## Phase three - Making the Items Draggable 
+```js
+<div className="todos">
+ {
+   todos.map(todo =>
+    <div
+     key={todo.taskID}
+     draggable
+     onDrag={(event) => this.onDrag(event, todo)}
+    >
+     {todo.task}
+    </div>)
+  }
+</div>
+```
+
+
+```js
+onDrag = (event, todo) => {
+  event.preventDefault();
+  this.setState({
+    draggedTask: todo
+  });
+}
+```
+
+
+```js
+<div
+  onDrop={event => this.onDrop(event)}
+  onDragOver={(event => this.onDragOver(event))}
+  className="done"
+>
+  ...
+</div>
+
+
+onDragOver = (event) => {
+  event.preventDefault();
+}
+onDrop = (event ) => {
+  const { completedTasks, draggedTask, todos } = this.state;
+  this.setState({
+    completedTasks: [...completedTasks, draggedTask],
+    todos: todos.filter(task => task.taskID !== draggedTask.taskID),
+    draggedTask: {},
+  });
+}
+```
+
+
 
 ## Making it an extension

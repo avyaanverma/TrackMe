@@ -1,27 +1,55 @@
+import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { Input } from "@/components/ui/input"
-
 function App() {
-  const storedTasks = JSON.parse(localStorage.getItem("tasks" || []));
-  const [value, setValue] = useState();
+  const storedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  const [value, setValue] = useState("");
   const [tasks, setTasks] = useState(storedTasks || []);
-  
+  const [draggedTask, setDraggedTask] = useState(null);
+
   useEffect(()=>{
     localStorage.setItem("tasks", JSON.stringify(tasks)); 
   }, [tasks])
 
   const handleInputChange = (e) => {
+    setValue(e.target.value);
+  }
+
+  // making draggable methods
+  const handleDragStart = (e, taskId, index) => {
+    e.dataTransfer.setData('text/plain', taskId);
+    e.dataTransfer.setData('application/json', JSON.stringify({taskId, index}));
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedTask(taskId);
+  }
+
+  const handleDragOver = (e) => {
     e.preventDefault();
-    setValue(e.target.value)    
+    e.dataTransfer.dropEffect = 'move';
+  }
+ 
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    const dragData = JSON.parse(e.dataTransfer.getData('application/json'));
+    const dragIndex =dragData.index;
+
+    if( dragIndex !== dropIndex){
+      const newTasks = [...tasks];
+      const draggedTask = newTasks[dragIndex];
+      newTasks.splice(dragIndex, 1);
+      newTasks.splice(dropIndex, 0, draggedTask );
+      setTasks(newTasks);
+    }
+
+  }
+
+  const handleDragEnd = () => {
+    setDraggedTask(null);
   }
 
   const deleteTask = (index)=>{
     
     setTasks(tasks.filter((task)=>{
-      return task.id!=index;
+      return task.id!==index;
     }));
     console.log(tasks);
   }
@@ -29,7 +57,7 @@ function App() {
   const addTask = ()=> {
     console.log();
     
-    if(value.trim() != ''){
+    if(value && value.trim() != ''){
       setTasks([...tasks, {
         id: Date.now(),
         title: value,
@@ -57,7 +85,7 @@ function App() {
     // if i want to check if value exists or not in array
 
    setTasks(tasks.map((task)=>{
-    if(task.id == id){
+    if(task.id === id){
       return {...task, done: !task.done}
     } else{
       return task;
@@ -94,13 +122,21 @@ function App() {
         <div className="rounded-sm mt-10 drop-shadow-xl  bg-white">
           <ul>          
             {
-              tasks && tasks.map((task)=> 
+              tasks && tasks.map((task, index)=> 
                 (
                   <li 
                   key={task.id}  
-                  className=" rounded-sm h-15 w-full flex flex-row border-b-2 items-center justify-left gap-4"
-
+                  className={` rounded-sm h-15 w-full flex flex-row border-b-2 items-center justify-left gap-4 draggedTask === task.id ? 'opacity-50 bg-gray-100' : 'hover:bg-gray-50`}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, task.id, index)}
+                  onDragOver = {handleDragOver}
+                  onDrop = {(e) => handleDrop(e, index)}
+                  onDragEnd= {handleDragEnd}
+                  // Removed onDragEnter and onDragLeave handlers as draggedTask state is unused
                   >
+                  <div className="flex items-center ml-2 gap-2 cursor-move">
+                      <span className="text-gray-400">⋮⋮</span>
+                    </div>
                   <input 
                     type="checkbox" 
                     checked={task.done}
@@ -114,11 +150,6 @@ function App() {
                     : 
                     <span className=''>{titleCase(task.title)}</span>
                   } 
-                  <span
-                    onClick={()=>{ deleteTask(task.id) }}
-                    className='cursor-pointer hover:text-lg'
-
-                    >🗑️</span> 
                   <span className='bg-blue-200 p-1 rounded-sm'>
                     {/* write a statement to write that  */}
                     {/*if the task is completed Pending in Red is written otherwise Completed in green */}
@@ -126,16 +157,27 @@ function App() {
                     <span className='text-green-500'>Completed</span>
                     :
                     <span className='text-red-500'>Pending</span>
-                    }
+                  }
                   </span>
 
                   <span className='text-gray-500 ml-4'>
                     {task.date}
                   </span>
+                  <span
+                    onClick={()=>{ deleteTask(task.id) }}
+                    className='cursor-pointer hover:text-lg'
+      
+                    >🗑️</span> 
                 </li>
               )
             )}
           </ul>
+
+          {tasks.length===0 && (
+            <div>
+              <p>No tasks yet. Add one above!</p>
+            </div>
+          )}  
         </div>
       </div>    
       </div>
