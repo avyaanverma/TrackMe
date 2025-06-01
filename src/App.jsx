@@ -93,15 +93,26 @@ function App() {
    }));
   }
 
+  const editTask = (id, input)=> {
+    // map function takes a callback where it performs function on the elements of the tasks array
+    setTasks(tasks.map((task)=>{
+      if(task.id == id){
+        return {...task, title: input}
+      }else{
+        return task;
+      }
+    }))
+  }
+
   return (
     <>
     <div className="font-mono text-white min-h-screen bg-gradient-to-r from-purple-500 via-purple-400 to-blue-500">
-      <div className='ml-80 flex flex-col justify-center items-start'>
+      <div className='w-screen h-20 flex flex-col justify-center items-center'>
         <h1 className='text-3xl tracking-[25px] font-bold text-white m-10'>TODO</h1>
       </div>
       
       <div>
-        <h1 className='text-2xl  font-bold text-white m-10'>
+        <h1 className='text-2xl  font-bold text-white m-5'>
           Date: {new Date().toLocaleDateString()}
         </h1>
       </div>
@@ -127,16 +138,19 @@ function App() {
                   <li 
                   key={task.id}  
                   className={` rounded-sm h-15 w-full flex flex-row border-b-2 items-center justify-left gap-4 draggedTask === task.id ? 'opacity-50 bg-gray-100' : 'hover:bg-gray-50`}
+                  
                   draggable
                   onDragStart={(e) => handleDragStart(e, task.id, index)}
                   onDragOver = {handleDragOver}
                   onDrop = {(e) => handleDrop(e, index)}
                   onDragEnd= {handleDragEnd}
+                  
                   // Removed onDragEnter and onDragLeave handlers as draggedTask state is unused
                   >
                   <div className="flex items-center ml-2 gap-2 cursor-move">
                       <span className="text-gray-400">⋮⋮</span>
                     </div>
+                  
                   <input 
                     type="checkbox" 
                     checked={task.done}
@@ -144,12 +158,35 @@ function App() {
                     className='ml-4 h-5 w-5 accent-purple-500 rounded-full cursor-pointer'
                     style={{accentColor: '#a78bfa', borderRadius: '50%'}}
                     />
-                  {
-                    task.done ? 
-                    <span className='line-through'>{titleCase(task.title)}</span>
-                    : 
-                    <span className=''>{titleCase(task.title)}</span>
-                  } 
+                  
+                    <span 
+                    className={`cursor-pointer ${task.done ? 'line-through text-gray-500' : ''}`}
+                    contentEditable={!task.done}
+                    suppressContentEditableWarning={true}
+                    // on Blur event is triggered when we have lost focus from the element 
+                    // eg: when you have edited and you exit task
+                    onBlur={(e)=>{
+                      const newTitle =e.target.textContent.trim();
+                      if(newTitle && newTitle!=task.title) {
+                        editTask(task.id, newTitle);
+                      }
+                    }}
+
+                    onKeyDown={(e)=>{
+                      if(e.key=='Enter'){
+                        e.preventDefault();
+                        // target property is reference to the object 
+                        // onto which the event was dispatched
+                        // 
+                        e.target.blur();
+                      }
+                    }}
+                    
+                    >
+                      {titleCase(task.title)}
+                    
+                    </span>
+                  
                   <span className='bg-blue-200 p-1 rounded-sm'>
                     {/* write a statement to write that  */}
                     {/*if the task is completed Pending in Red is written otherwise Completed in green */}
